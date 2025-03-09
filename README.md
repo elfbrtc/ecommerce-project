@@ -2,32 +2,60 @@
 
 Bu proje, e-ticaret verilerinin analizi ve ürün öneri sistemi geliştirmeyi içermektedir.
 
-## Özellikler
+## Kurulum Adımları
 
-- API'den veri çekme ve işleme
-- Veri temizleme ve manipülasyon
-- Detaylı veri analizi
-- Dinamik fiyatlandırma sistemi
-- Ürün öneri sistemi
+### Gereksinimler
+- Python 3.8+
+- Node.js ve npm
 
-## Kurulum
+### 1. Projeyi İndirin
+```bash
+git clone [GITHUB_REPO_URL]
+cd [PROJE_KLASÖRÜ]
+```
 
-1. Gerekli paketleri yükleyin:
+### 2. Python Bağımlılıklarını Yükleyin
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Projeyi çalıştırın:
+### 3. JSON Server'ı Yükleyin
 ```bash
-python main.py
+npm install -g json-server
 ```
+
+### 4. Projeyi Çalıştırın
+
+#### 4.1. JSON Server'ı Başlatın
+Yeni bir terminal açın ve aşağıdaki komutu çalıştırın:
+```bash
+npx json-server --watch db.json --port 3000
+```
+
+#### 4.2. Uygulamayı Çalıştırın
+Başka bir terminal açın ve aşağıdaki komutu çalıştırın:
+```bash
+python main.py --use-api
+```
+
+## API Kullanımı
+
+JSON Server çalıştıktan sonra aşağıdaki endpoint'lere erişebilirsiniz:
+
+- Tüm ürünler: GET http://localhost:3000/products
+- Tek ürün: GET http://localhost:3000/products/1
+- Ürün filtreleme: GET http://localhost:3000/products?category=Elektronik
+- Müşteriler: GET http://localhost:3000/customers
+- Kategoriler: GET http://localhost:3000/categories
 
 ## Proje Yapısı
 
 - `main.py`: Ana program dosyası
 - `data_processor.py`: Veri işleme modülü
 - `api_client.py`: API iletişim modülü
-- `requirements.txt`: Proje bağımlılıkları
+- `requirements.txt`: Python bağımlılıkları
+- `db.json`: API için veri dosyası
+- `package.json`: Node.js bağımlılıkları
 
 ## Kullanılan Teknolojiler
 
