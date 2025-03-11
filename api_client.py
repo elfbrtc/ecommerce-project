@@ -23,18 +23,18 @@ class ECommerceAPI:
     
     def _generate_sample_data(self):
         """Örnek veri oluşturma"""
-        # Sadece 10 ürün seçelim (her kategoriden 1 ürün)
-        selected_products = {
-            'Elektronik': 'Laptop',
-            'Giyim': 'T-shirt',
-            'Kitap': 'Roman',
-            'Spor': 'Futbol Topu',
-            'Ev & Yaşam': 'Mobilya',
-            'Kozmetik': 'Parfüm',
-            'Oyuncak': 'Lego',
-            'Bahçe': 'Bitki',
-            'Otomotiv': 'Araç Aksesuarı',
-            'Kırtasiye': 'Kalem'
+        # Kategori bazlı ürünler (her kategoride birden fazla ürün)
+        category_products = {
+            'Elektronik': ['Laptop', 'Akıllı Telefon', 'Tablet', 'Kulaklık', 'Monitör', 'Klavye', 'Mouse', 'Kamera'],
+            'Giyim': ['T-shirt', 'Pantolon', 'Elbise', 'Gömlek', 'Ceket', 'Ayakkabı', 'Çanta', 'Şapka'],
+            'Kitap': ['Roman', 'Bilim Kurgu', 'Tarih', 'Biyografi', 'Kişisel Gelişim', 'Çocuk Kitabı', 'Dergi', 'Akademik'],
+            'Spor': ['Futbol Topu', 'Koşu Ayakkabısı', 'Fitness Ekipmanı', 'Bisiklet', 'Yüzme Gözlüğü', 'Tenis Raketi', 'Yoga Matı', 'Spor Çantası'],
+            'Ev & Yaşam': ['Mobilya', 'Mutfak Eşyası', 'Yatak Örtüsü', 'Aydınlatma', 'Dekorasyon', 'Halı', 'Perde', 'Ev Tekstili'],
+            'Kozmetik': ['Parfüm', 'Ruj', 'Fondöten', 'Şampuan', 'Krem', 'Güneş Kremi', 'Makyaj Seti', 'Saç Bakım Ürünü'],
+            'Oyuncak': ['Lego', 'Peluş Oyuncak', 'Puzzle', 'Oyun Konsolu', 'Kutu Oyunu', 'Bebek', 'Uzaktan Kumandalı Araba', 'Eğitici Oyuncak'],
+            'Bahçe': ['Bitki', 'Bahçe Mobilyası', 'Çim Biçme Makinesi', 'Sulama Sistemi', 'Tohum', 'Saksı', 'Bahçe Aletleri', 'Gübre'],
+            'Otomotiv': ['Araç Aksesuarı', 'Oto Parfümü', 'Lastik', 'Yağ', 'Araç Bakım Ürünü', 'Navigasyon Cihazı', 'Araç Şarj Cihazı', 'Koltuk Kılıfı'],
+            'Kırtasiye': ['Kalem', 'Defter', 'Dosya', 'Hesap Makinesi', 'Çanta', 'Takvim', 'Ajanda', 'Boya Seti']
         }
         
         # Kategori bazlı fiyat aralıkları (daha gerçekçi)
@@ -52,10 +52,10 @@ class ECommerceAPI:
         }
         
         # Müşteri sayısı
-        n_customers = 10
+        n_customers = 20  # Müşteri sayısını artırdık
         
-        # Toplam satış sayısı (her müşteri her üründen 1 kez alsın = 100 satış)
-        n_sales = 100
+        # Toplam satış sayısı (her müşteri her kategoriden rastgele 2-4 ürün alsın)
+        n_sales = 0  # Başlangıçta 0, dinamik olarak hesaplanacak
         
         # Müşteri bilgileri
         customers = []
@@ -72,7 +72,7 @@ class ECommerceAPI:
         
         # Satış verileri
         data = {
-            'id': list(range(1, n_sales + 1)),
+            'id': [],
             'customer_id': [],
             'product_name': [],
             'category': [],
@@ -88,38 +88,51 @@ class ECommerceAPI:
         # Ödeme yöntemleri
         payment_methods = ['Kredi Kartı', 'Havale', 'Kapıda Ödeme', 'Mobil Ödeme', 'Kripto Para']
         
-        # Veri oluşturma - her müşteri her üründen 1 kez alsın
+        # Veri oluşturma - her müşteri her kategoriden rastgele 2-4 ürün alsın
         sale_id = 1
         for customer in customers:
-            for category, product in selected_products.items():
-                # Müşteri ID
-                data['customer_id'].append(customer['id'])
+            for category, products in category_products.items():
+                # Her kategoriden kaç ürün alacak
+                n_products_to_buy = random.randint(2, 4)
                 
-                # Ürün ve kategori
-                data['category'].append(category)
-                data['product_name'].append(product)
+                # Rastgele ürünler seç
+                selected_products = random.sample(products, min(n_products_to_buy, len(products)))
                 
-                # Fiyat (kategori bazlı)
-                min_price, max_price = category_price_ranges[category]
-                price = round(random.uniform(min_price, max_price), 2)
-                data['price'].append(price)
-                
-                # Tarih
-                date = (datetime.now() - pd.Timedelta(days=random.randint(0, 365))).strftime('%Y-%m-%d')
-                data['purchase_date'].append(date)
-                
-                # Miktar
-                data['quantity'].append(random.randint(1, 5))
-                
-                # Memnuniyet puanı
-                data['satisfaction_score'].append(round(random.uniform(1, 5), 1))
-                
-                # Ek alanlar
-                data['payment_method'].append(random.choice(payment_methods))
-                data['shipping_cost'].append(round(random.uniform(0, 50), 2))
-                data['discount_applied'].append(random.choice([True, False]))
-                
-                sale_id += 1
+                for product in selected_products:
+                    # ID
+                    data['id'].append(sale_id)
+                    
+                    # Müşteri ID
+                    data['customer_id'].append(customer['id'])
+                    
+                    # Ürün ve kategori
+                    data['category'].append(category)
+                    data['product_name'].append(product)
+                    
+                    # Fiyat (kategori bazlı)
+                    min_price, max_price = category_price_ranges[category]
+                    price = round(random.uniform(min_price, max_price), 2)
+                    data['price'].append(price)
+                    
+                    # Tarih
+                    date = (datetime.now() - pd.Timedelta(days=random.randint(0, 365))).strftime('%Y-%m-%d')
+                    data['purchase_date'].append(date)
+                    
+                    # Miktar
+                    data['quantity'].append(random.randint(1, 5))
+                    
+                    # Memnuniyet puanı
+                    data['satisfaction_score'].append(round(random.uniform(1, 5), 1))
+                    
+                    # Ek alanlar
+                    data['payment_method'].append(random.choice(payment_methods))
+                    data['shipping_cost'].append(round(random.uniform(0, 50), 2))
+                    data['discount_applied'].append(random.choice([True, False]))
+                    
+                    sale_id += 1
+        
+        # Toplam satış sayısını güncelle
+        n_sales = len(data['id'])
         
         # DataFrame oluşturma
         df = pd.DataFrame(data)
@@ -129,9 +142,30 @@ class ECommerceAPI:
         missing_indices = random.sample(range(n_sales), int(n_sales * 0.05))
         
         for idx in missing_indices:
-            # Rastgele bir alan seç ve eksik bırak
-            field = random.choice(['product_name', 'price', 'purchase_date', 'quantity', 'satisfaction_score'])
+            # Rastgele bir alan seç ve eksik bırak (quantity hariç)
+            field = random.choice(['price', 'product_name', 'purchase_date', 'satisfaction_score'])
             df.loc[idx, field] = None
+        
+        # Satisfaction score için daha fazla eksik veri oluştur (satışların %15'i)
+        satisfaction_missing_indices = random.sample(range(n_sales), int(n_sales * 0.15))
+        for idx in satisfaction_missing_indices:
+            df.loc[idx, 'satisfaction_score'] = None
+            
+        # Bazı ürünlerin fiyatlarını değişken yap (aynı ürün farklı fiyatlarda olabilir)
+        # Bu, fiyat analizini daha ilginç hale getirecek
+        for category, products in category_products.items():
+            for product in products:
+                # Bu ürünün satışlarını bul
+                product_indices = df[df['product_name'] == product].index.tolist()
+                
+                if len(product_indices) > 1:
+                    # Fiyat varyasyonu ekle (±%10)
+                    for idx in product_indices:
+                        if random.random() < 0.3:  # %30 olasılıkla fiyatı değiştir
+                            current_price = df.loc[idx, 'price']
+                            if pd.notna(current_price):
+                                variation = random.uniform(0.9, 1.1)  # %10 yukarı veya aşağı
+                                df.loc[idx, 'price'] = round(current_price * variation, 2)
         
         return df, customers
     
@@ -245,6 +279,8 @@ class ECommerceAPI:
         if self.use_local_api:
             try:
                 # API'den veri çekme
+                print("API'den veri çekiliyor...")
+                print(self.api_url)
                 response = requests.get(self.api_url)
                 if response.status_code == 200:
                     data = response.json()

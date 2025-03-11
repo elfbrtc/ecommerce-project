@@ -47,19 +47,27 @@ def main():
     processor.plot_missing_data()
     
     # 1. En çok satın alınan ürünler
-    print("\nEn çok satın alınan 10 ürün:")
-    top_products = processor.analyze_top_products()
+    print("\nEn çok satın alınan 15 ürün:")
+    top_products = processor.analyze_top_products(n=15)
     print(top_products)
     
     # Görselleştirme
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(14, 8))
     top_products.plot(kind='bar')
-    plt.title('En Çok Satın Alınan 10 Ürün')
+    plt.title('En Çok Satın Alınan 15 Ürün')
     plt.xlabel('Ürün')
     plt.ylabel('Toplam Satış Miktarı')
     plt.xticks(rotation=45)
     plt.tight_layout()
     plt.show()
+    
+    # 1.1 Kategori bazlı en popüler ürünler
+    print("\nKategori bazlı en popüler ürünler:")
+    category_popular_products = processor.df.groupby(['category', 'product_name'])['quantity'].sum().reset_index()
+    for category in processor.df['category'].unique():
+        cat_products = category_popular_products[category_popular_products['category'] == category].sort_values('quantity', ascending=False).head(3)
+        print(f"\n{category} kategorisinde en popüler 3 ürün:")
+        print(cat_products[['product_name', 'quantity']])
     
     # 2. Fiyat ve satış miktarı korelasyonu
     print("\nFiyat ve satış miktarı korelasyonu:")
@@ -108,15 +116,28 @@ def main():
     plt.show()
     
     # 6. Dinamik fiyatlandırma önerileri
-    print("\nDinamik fiyatlandırma önerileri:")
-    price_updates = processor.dynamic_pricing(threshold=0.2)
+    # NumPy ile dinamik fiyatlandırma
+    print("\nNumPy ile dinamik fiyatlandırma önerileri:")
+    numpy_price_updates = processor.dynamic_pricing(threshold=0.1)  # Eşik değerini 0.1'e düşürdük
     
-    # Sadece ilk 10 öneriyi gösterelim
-    for i, (product, new_price) in enumerate(price_updates.items()):
-        print(f"{product}: {new_price:.2f} TL")
-        if i >= 9:
-            print(f"... ve {len(price_updates) - 10} ürün daha")
-            break
+    # Önerileri göster
+    if numpy_price_updates:
+        print(f"Toplam {len(numpy_price_updates)} ürün için fiyat güncellemesi önerildi:")
+        
+        # Kategori bazlı fiyat güncellemelerini göster
+        price_updates_df = pd.DataFrame(list(numpy_price_updates.items()), columns=['Ürün', 'Yeni Fiyat'])
+        price_updates_df['Kategori'] = price_updates_df['Ürün'].apply(
+            lambda x: processor.df[processor.df['product_name'] == x]['category'].iloc[0] if len(processor.df[processor.df['product_name'] == x]) > 0 else 'Bilinmiyor'
+        )
+        
+        # Kategori bazlı grupla
+        for category in price_updates_df['Kategori'].unique():
+            cat_updates = price_updates_df[price_updates_df['Kategori'] == category]
+            print(f"\n{category} kategorisinde {len(cat_updates)} ürün için fiyat güncellemesi:")
+            for _, row in cat_updates.iterrows():
+                print(f"{row['Ürün']}: {row['Yeni Fiyat']:.2f} TL")
+    else:
+        print("Fiyat güncellemesi önerilen ürün bulunamadı.")
     
     # 7. Ürün önerileri
     print("\nÖrnek müşteri için ürün önerileri (Müşteri ID: 1):")
@@ -191,7 +212,7 @@ def main():
     }
     
     # price_updates sözlüğünü DataFrame'e dönüştürme
-    price_updates_df = pd.DataFrame(list(price_updates.items()), columns=['Ürün', 'Yeni Fiyat'])
+    price_updates_df = pd.DataFrame(list(numpy_price_updates.items()), columns=['Ürün', 'Yeni Fiyat'])
     
     # Excel dosyasına kaydetme
     with pd.ExcelWriter('analiz_sonuclari.xlsx') as writer:
