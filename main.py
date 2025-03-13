@@ -34,7 +34,7 @@ def main():
     print(f"Satır sayısı: {df.shape[0]}, Sütun sayısı: {df.shape[1]}")
     print("\nSütunlar:")
     for col in df.columns:
-        print(f"- {col}")
+    print(f"- {col}")
     
     # Eksik veri analizi (işlemeden önce)
     print("\nEksik veri analizi (temizleme öncesi):")
