@@ -1,9 +1,22 @@
-from api_client import ECommerceAPI
-from data_processor import DataProcessor
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import argparse
+from sys import exit
+
+try:
+    from api_client import ECommerceAPI
+    from data_processor import DataProcessor
+    # Eğer kullanıcı bu modüllere erişemez veya silerse şöyle bir hata mesajı göster
+except ModuleNotFoundError as error_system_module:
+    print(f"{error_system_module}\nBazı sistem dosyaları eksik veya hatal görünüyor :d")
+    exit()
+
+try:
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import argparse
+    # Yüklü olmayan Modülleri tespit et ve hata mesajı göster
+except ModuleNotFoundError as error_module:
+    print(f"{error_module}\nYukarıdaki modüller yüklü görnmüyor! Şu komutu girin: pip install -r requirements.txt")
+    exit()
 
 def main():
     # Komut satırı argümanlarını ayarla
@@ -21,7 +34,7 @@ def main():
     print(f"Satır sayısı: {df.shape[0]}, Sütun sayısı: {df.shape[1]}")
     print("\nSütunlar:")
     for col in df.columns:
-        print(f"- {col}")
+    print(f"- {col}")
     
     # Eksik veri analizi (işlemeden önce)
     print("\nEksik veri analizi (temizleme öncesi):")
@@ -236,6 +249,7 @@ def main():
         print("  * Ürün filtreleme: GET http://localhost:3000/products?category=Elektronik")
         print("  * Müşteriler: GET http://localhost:3000/customers")
         print("  * Kategoriler: GET http://localhost:3000/categories")
+
 
 if __name__ == "__main__":
     main() 
